@@ -131,10 +131,10 @@ class ResponseService
     }
 
     /**
-     * @param string $message
+     * @param string|null $message
      * @return RequestException
      */
-    public function createException($message): RequestException
+    public function createException(?string $message): RequestException
     {
         $level = (int) floor($this->response->getStatusCode() / 100);
         $className = RequestException::class;
@@ -145,6 +145,6 @@ class ResponseService
             $className = ServerException::class;
         }
 
-        return new $className($message, $this->request, $this->response);
+        return new $className($message ?? 'Unknown error.', $this->request, $this->response);
     }
 }
