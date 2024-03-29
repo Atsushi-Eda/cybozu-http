@@ -81,14 +81,14 @@ class ResponseService
             }
             if ($title === 'Error') {
                 $message = $dom->getElementsByTagName('h3')->item(0)->nodeValue;
-                throw $this->createException($message);
+                throw $this->createException($message, ['responseBody' => $body]);
             }
             if ($title === 'Unauthorized') {
                 $message = $dom->getElementsByTagName('h2')->item(0)->nodeValue;
-                throw $this->createException($message);
+                throw $this->createException($message, ['responseBody' => $body]);
             }
 
-            throw $this->createException('Invalid auth.');
+            throw $this->createException('Invalid auth.', ['responseBody' => $body]);
         }
 
         throw new \InvalidArgumentException('Body is not DOM.');
@@ -113,7 +113,7 @@ class ResponseService
             $message .= $this->addErrorMessages($json['errors']);
         }
 
-        throw $this->createException($message);
+        throw $this->createException($message, ['responseBody' => $body]);
     }
 
     /**
@@ -140,9 +140,10 @@ class ResponseService
 
     /**
      * @param string|null $message
+     * @param array $handlerContext
      * @return RequestException
      */
-    public function createException(?string $message): RequestException
+    public function createException(?string $message, array $handlerContext = []): RequestException
     {
         $level = (int) floor($this->response->getStatusCode() / 100);
         $className = RequestException::class;
@@ -153,6 +154,6 @@ class ResponseService
             $className = ServerException::class;
         }
 
-        return new $className($message ?? 'Unknown error.', $this->request, $this->response, $this->previousThrowable);
+        return new $className($message ?? 'Unknown error.', $this->request, $this->response, $this->previousThrowable, $handlerContext);
     }
 }
