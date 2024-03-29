@@ -76,7 +76,7 @@ class File
     {
         $response = $result->getResponse();
         if ($response instanceof ResponseInterface) {
-            $service = new ResponseService($result->getRequest(), $response);
+            $service = new ResponseService($result->getRequest(), $response, $result);
             if ($service->isJsonResponse()) {
                 $service->handleJsonError();
             }
