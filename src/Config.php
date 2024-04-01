@@ -3,7 +3,8 @@
 namespace CybozuHttp;
 
 use CybozuHttp\Exception\NotExistRequiredException;
-use CybozuHttp\Middleware\FinishMiddleware;
+use CybozuHttp\Middleware\ResponseMiddleware;
+use CybozuHttp\Middleware\ErrorMiddleware;
 use GuzzleHttp\HandlerStack;
 
 /**
@@ -28,6 +29,7 @@ class Config
         'base_uri' => null,
         'concurrency' => 1,
         'response_middleware' => true,
+        'error_middleware' => true,
         'debug' => false
     ];
 
@@ -61,7 +63,10 @@ class Config
         $this->configureCert();
 
         if ($this->config['response_middleware']) {
-            $handler->before('http_errors', new FinishMiddleware(), 'cybozu_http.finish');
+            $handler->before('http_errors', new ResponseMiddleware(), 'cybozu_http.response');
+        }
+        if ($this->config['error_middleware']) {
+            $handler->before('http_errors', new ErrorMiddleware(), 'cybozu_http.error');
         }
     }
 
