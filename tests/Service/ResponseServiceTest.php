@@ -46,7 +46,7 @@ class ResponseServiceTest extends TestCase
         $this->assertFalse($service->isJsonResponse());
     }
 
-    public function testHandleDomError(): void
+    public function testHandleError(): void
     {
         $request = new Request('GET', '/');
         $dom = '<title>Bad request</title><div>bad request</div>';
@@ -55,7 +55,7 @@ class ResponseServiceTest extends TestCase
         $service = new ResponseService($request, $response, $exception);
 
         try {
-            $service->handleDomError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
@@ -68,7 +68,7 @@ class ResponseServiceTest extends TestCase
         $service = new ResponseService($request, $response, $exception);
 
         try {
-            $service->handleDomError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
@@ -81,7 +81,7 @@ class ResponseServiceTest extends TestCase
         $service = new ResponseService($request, $response, $exception);
 
         try {
-            $service->handleDomError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
@@ -94,7 +94,7 @@ class ResponseServiceTest extends TestCase
         $service = new ResponseService($request, $response, $exception);
 
         try {
-            $service->handleDomError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(ServerException::class, $e);
@@ -106,7 +106,7 @@ class ResponseServiceTest extends TestCase
         $service = new ResponseService($request, $response, $exception);
 
         try {
-            $service->handleDomError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(UnknownClientException::class, $e);
@@ -114,10 +114,7 @@ class ResponseServiceTest extends TestCase
             $this->assertEquals($e->getPrevious(), $exception);
             $this->assertEquals($e->getHandlerContext()['responseBody'], $dom);
         }
-    }
 
-    public function testHandleJsonError(): void
-    {
         $request = new Request('GET', '/');
         $body = json_encode([
             'message' => 'simple error',
@@ -134,7 +131,7 @@ class ResponseServiceTest extends TestCase
         $exception = new RequestException('raw error', $request, $response);
         $service = new ResponseService($request, $response, $exception);
         try {
-            $service->handleJsonError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
@@ -153,7 +150,7 @@ class ResponseServiceTest extends TestCase
         $exception = new RequestException('raw error', $request, $response);
         $service = new ResponseService($request, $response, $exception);
         try {
-            $service->handleJsonError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
@@ -167,7 +164,7 @@ class ResponseServiceTest extends TestCase
         $exception = new RequestException('raw error', $request, $response);
         $service = new ResponseService($request, $response, $exception);
         try {
-            $service->handleJsonError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(UnknownClientException::class, $e);
@@ -181,7 +178,7 @@ class ResponseServiceTest extends TestCase
         $exception = new RequestException('raw error', $request, $response);
         $service = new ResponseService($request, $response, $exception);
         try {
-            $service->handleJsonError();
+            $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(UnknownClientException::class, $e);
