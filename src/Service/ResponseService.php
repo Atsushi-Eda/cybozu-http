@@ -2,6 +2,9 @@
 
 namespace CybozuHttp\Service;
 
+use CybozuHttp\Exception\UnknownClientException;
+use CybozuHttp\Exception\UnknownRequestException;
+use CybozuHttp\Exception\UnknownServerException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
@@ -131,10 +134,22 @@ class ResponseService
     }
 
     /**
+     * @param string|null $message
+     * @return RequestException
+     */
+    public function createException(?string $message): RequestException
+    {
+        if (is_null($message)) {
+            return $this->createUnknownException();
+        }
+        return $this->createKnownException($message);
+    }
+
+    /**
      * @param string $message
      * @return RequestException
      */
-    public function createException($message): RequestException
+    private function createKnownException(string $message): RequestException
     {
         $level = (int) floor($this->response->getStatusCode() / 100);
         $className = RequestException::class;
@@ -146,5 +161,22 @@ class ResponseService
         }
 
         return new $className($message, $this->request, $this->response);
+    }
+
+    /**
+     * @return RequestException
+     */
+    private function createUnknownException(): RequestException
+    {
+        $level = (int) floor($this->response->getStatusCode() / 100);
+        $className = UnknownRequestException::class;
+
+        if ($level === 4) {
+            $className = UnknownClientException::class;
+        } elseif ($level === 5) {
+            $className = UnknownServerException::class;
+        }
+
+        return new $className('Unknown error.', $this->request, $this->response);
     }
 }

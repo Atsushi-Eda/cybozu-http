@@ -2,6 +2,7 @@
 
 namespace CybozuHttp\Service;
 
+use CybozuHttp\Exception\UnknownClientException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
@@ -136,6 +137,19 @@ class ResponseServiceTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
             $this->assertEquals($e->getMessage(), 'simple error (error2 : detail error)');
+        }
+
+        $body = json_encode([
+            'unknown' => 'simple error',
+        ]);
+        $response = new Response(400, ['Content-Type' => 'application/json; charset=utf-8'], $body);
+        $service = new ResponseService($request, $response);
+        try {
+            $service->handleJsonError();
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertEquals($e->getMessage(), 'Unknown error.');
         }
 
         /** @var Response|MockObject $response */
