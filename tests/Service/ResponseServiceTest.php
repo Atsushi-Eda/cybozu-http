@@ -100,6 +100,21 @@ class ResponseServiceTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(ServerException::class, $e);
         }
+
+        $dom = '<title>invalid dom</h3>';
+        $response = new Response(400, ['Content-Type' => 'text/html; charset=utf-8'], $dom);
+        $exception = new RequestException('raw error', $request, $response);
+        $service = new ResponseService($request, $response, $exception);
+
+        try {
+            $service->handleDomError();
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertEquals($e->getMessage(), 'Unknown error.');
+            $this->assertEquals($e->getPrevious(), $exception);
+            $this->assertEquals($e->getHandlerContext()['responseBody'], $dom);
+        }
     }
 
     public function testHandleJsonError(): void
