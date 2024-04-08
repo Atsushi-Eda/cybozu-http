@@ -115,7 +115,7 @@ class ResponseService
             $body = $this->getResponseBody();
             $json = \GuzzleHttp\json_decode($body, true);
         } catch (\InvalidArgumentException $e) {
-            return;
+            throw $this->createUnknownException();
         }
 
         $message = $json['message'];
