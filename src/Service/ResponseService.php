@@ -165,7 +165,7 @@ class ResponseService
      * @param string|null $message
      * @return RequestException
      */
-    public function createException(?string $message): RequestException
+    private function createException(?string $message): RequestException
     {
         if (is_null($message)) {
             return $this->createUnknownException();
