@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 /**
  * @author ochi51 <ochiai07@gmail.com>
@@ -27,14 +28,20 @@ class ResponseService
     private $response;
 
     /**
+     * @var Throwable|null
+     */
+    private $previousThrowable;
+
+    /**
      * ResponseService constructor.
      * @param RequestInterface $request
      * @param ResponseInterface $response
      */
-    public function __construct(RequestInterface $request, ResponseInterface $response)
+    public function __construct(RequestInterface $request, ResponseInterface $response, ?Throwable $previousThrowable = null)
     {
         $this->request = $request;
         $this->response = $response;
+        $this->previousThrowable = $previousThrowable;
     }
 
     /**
@@ -177,6 +184,6 @@ class ResponseService
             $className = UnknownServerException::class;
         }
 
-        return new $className('Unknown error.', $this->request, $this->response);
+        return new $className('Unknown error.', $this->request, $this->response, $this->previousThrowable);
     }
 }
