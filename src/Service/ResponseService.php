@@ -82,7 +82,7 @@ class ResponseService
             $this->handleDomError();
         }
 
-        throw $this->previousThrowable;
+        throw $this->createUnknownException();
     }
 
     /**

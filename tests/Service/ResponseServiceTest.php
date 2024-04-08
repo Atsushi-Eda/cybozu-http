@@ -186,5 +186,26 @@ class ResponseServiceTest extends TestCase
             $this->assertEquals($e->getPrevious(), $exception);
             $this->assertEquals($e->getHandlerContext()['responseBody'], $body);
         }
+
+        $body = json_encode([
+            'message' => 'simple error',
+            'errors' => [
+                'error2' => [
+                    'messages' => 'detail error'
+                ]
+            ]
+        ]);
+        $response = new Response(400, ['Content-Type' => 'text/plain; charset=utf-8'], $body);
+        $exception = new RequestException('raw error', $request, $response);
+        $service = new ResponseService($request, $response, $exception);
+        try {
+            $service->handleError();
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertEquals($e->getMessage(), 'Unknown error.');
+            $this->assertEquals($e->getPrevious(), $exception);
+            $this->assertEquals($e->getHandlerContext()['responseBody'], $body);
+        }
     }
 }
