@@ -28,6 +28,11 @@ class ResponseService
     private $response;
 
     /**
+     * @var string|null
+     */
+    private $responseBody = null;
+
+    /**
      * @var Throwable|null
      */
     private $previousThrowable;
@@ -72,7 +77,7 @@ class ResponseService
      */
     public function handleDomError(): void
     {
-        $body = (string)$this->response->getBody()->getContents();
+        $body = $this->getResponseBody();
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
@@ -102,7 +107,7 @@ class ResponseService
     public function handleJsonError(): void
     {
         try {
-            $body = (string)$this->response->getBody()->getContents();
+            $body = $this->getResponseBody();
             $json = \GuzzleHttp\json_decode($body, true);
         } catch (\InvalidArgumentException $e) {
             return;
@@ -116,6 +121,19 @@ class ResponseService
         }
 
         throw $this->createException($message);
+    }
+
+    /**
+     * In stream mode, contents can be obtained only once, so this method makes it reusable.
+     * @return string
+     */
+    private function getResponseBody(): string
+    {
+        if (is_null($this->responseBody)) {
+            $this->responseBody = $this->response->getBody()->getContents();
+        }
+
+        return $this->responseBody;
     }
 
     /**
@@ -184,6 +202,12 @@ class ResponseService
             $className = UnknownServerException::class;
         }
 
-        return new $className('Unknown error.', $this->request, $this->response, $this->previousThrowable);
+        return new $className(
+            'Unknown error.',
+            $this->request,
+            $this->response,
+            $this->previousThrowable,
+            ['responseBody' => $this->getResponseBody()]
+        );
     }
 }

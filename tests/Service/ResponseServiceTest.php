@@ -159,6 +159,7 @@ class ResponseServiceTest extends TestCase
             $this->assertInstanceOf(UnknownClientException::class, $e);
             $this->assertEquals($e->getMessage(), 'Unknown error.');
             $this->assertEquals($e->getPrevious(), $exception);
+            $this->assertEquals($e->getHandlerContext()['responseBody'], $body);
         }
 
         /** @var Response|MockObject $response */
