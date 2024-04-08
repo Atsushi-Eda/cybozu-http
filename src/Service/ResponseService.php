@@ -119,6 +119,9 @@ class ResponseService
         if (isset($json['errors']) && is_array($json['errors'])) {
             $message .= $this->addErrorMessages($json['errors']);
         }
+        if (is_null($message) && isset($json['reason'])) {
+            $message = $json['reason'];
+        }
 
         throw $this->createException($message);
     }
