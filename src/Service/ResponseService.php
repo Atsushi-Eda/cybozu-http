@@ -94,29 +94,24 @@ class ResponseService
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
-
-        try {
-            if (!$dom->loadHTML($body)) {
-                throw $this->createUnknownException();
+        if ($dom->loadHTML($body)) {
+            $title = $dom->getElementsByTagName('title');
+            if (is_object($title)) {
+                $title = $title->item(0)->nodeValue;
             }
-        } catch (\Exception $e) {
-            throw $this->createUnknownException();
+            if ($title === 'Error') {
+                $message = $dom->getElementsByTagName('h3')->item(0)->nodeValue;
+                throw $this->createException($message);
+            }
+            if ($title === 'Unauthorized') {
+                $message = $dom->getElementsByTagName('h2')->item(0)->nodeValue;
+                throw $this->createException($message);
+            }
+
+            throw $this->createException('Invalid auth.');
         }
 
-        $title = $dom->getElementsByTagName('title');
-        if (is_object($title)) {
-            $title = $title->item(0)->nodeValue;
-        }
-        if ($title === 'Error') {
-            $message = $dom->getElementsByTagName('h3')->item(0)->nodeValue;
-            throw $this->createException($message);
-        }
-        if ($title === 'Unauthorized') {
-            $message = $dom->getElementsByTagName('h2')->item(0)->nodeValue;
-            throw $this->createException($message);
-        }
-
-        throw $this->createException('Invalid auth.');
+        throw new \InvalidArgumentException('Body is not DOM.');
     }
 
     /**
