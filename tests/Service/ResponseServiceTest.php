@@ -166,10 +166,7 @@ class ResponseServiceTest extends TestCase
             $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(RuntimeException::class, $e);
-            $this->assertEquals($e->getMessage(), 'Unknown error.');
-            $this->assertEquals($e->getPrevious(), $exception);
-            $this->assertEquals($e->getContext()['responseBody'], $body);
+            $this->assertInstanceOf(\InvalidArgumentException::class, $e);
         }
 
         $body = json_encode([

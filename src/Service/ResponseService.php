@@ -120,12 +120,8 @@ class ResponseService
      */
     private function handleJsonError(): void
     {
-        try {
-            $body = $this->getResponseBody();
-            $json = \GuzzleHttp\json_decode($body, true);
-        } catch (\InvalidArgumentException $e) {
-            throw $this->createUnknownException();
-        }
+        $body = $this->getResponseBody();
+        $json = \GuzzleHttp\json_decode($body, true);
 
         $message = $json['message'];
         if (isset($json['errors']) && is_array($json['errors'])) {
