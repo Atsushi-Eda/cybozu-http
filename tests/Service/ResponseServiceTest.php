@@ -2,7 +2,7 @@
 
 namespace CybozuHttp\Service;
 
-use CybozuHttp\Exception\UnknownClientException;
+use CybozuHttp\Exception\RuntimeException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
@@ -109,10 +109,10 @@ class ResponseServiceTest extends TestCase
             $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertInstanceOf(RuntimeException::class, $e);
             $this->assertEquals($e->getMessage(), 'Unknown error.');
             $this->assertEquals($e->getPrevious(), $exception);
-            $this->assertEquals($e->getHandlerContext()['responseBody'], $dom);
+            $this->assertEquals($e->getContext()['responseBody'], $dom);
         }
 
         $request = new Request('GET', '/');
@@ -167,10 +167,10 @@ class ResponseServiceTest extends TestCase
             $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertInstanceOf(RuntimeException::class, $e);
             $this->assertEquals($e->getMessage(), 'Unknown error.');
             $this->assertEquals($e->getPrevious(), $exception);
-            $this->assertEquals($e->getHandlerContext()['responseBody'], $body);
+            $this->assertEquals($e->getContext()['responseBody'], $body);
         }
 
         $body = 'invalid json';
@@ -181,10 +181,10 @@ class ResponseServiceTest extends TestCase
             $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertInstanceOf(RuntimeException::class, $e);
             $this->assertEquals($e->getMessage(), 'Unknown error.');
             $this->assertEquals($e->getPrevious(), $exception);
-            $this->assertEquals($e->getHandlerContext()['responseBody'], $body);
+            $this->assertEquals($e->getContext()['responseBody'], $body);
         }
 
         $body = json_encode([
@@ -202,10 +202,10 @@ class ResponseServiceTest extends TestCase
             $service->handleError();
             $this->assertTrue(false);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(UnknownClientException::class, $e);
+            $this->assertInstanceOf(RuntimeException::class, $e);
             $this->assertEquals($e->getMessage(), 'Unknown error.');
             $this->assertEquals($e->getPrevious(), $exception);
-            $this->assertEquals($e->getHandlerContext()['responseBody'], $body);
+            $this->assertEquals($e->getContext()['responseBody'], $body);
         }
     }
 }

@@ -2,9 +2,7 @@
 
 namespace CybozuHttp\Service;
 
-use CybozuHttp\Exception\UnknownClientException;
-use CybozuHttp\Exception\UnknownRequestException;
-use CybozuHttp\Exception\UnknownServerException;
+use CybozuHttp\Exception\RuntimeException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
@@ -73,6 +71,7 @@ class ResponseService
 
     /**
      * @throws RequestException
+     * @return RuntimeException
      */
     public function handleError(): void
     {
@@ -87,6 +86,7 @@ class ResponseService
 
     /**
      * @throws RequestException
+     * @return RuntimeException
      */
     private function handleDomError(): void
     {
@@ -121,6 +121,7 @@ class ResponseService
 
     /**
      * @throws RequestException
+     * @return RuntimeException
      */
     private function handleJsonError(): void
     {
@@ -179,9 +180,9 @@ class ResponseService
 
     /**
      * @param string|null $message
-     * @return RequestException
+     * @return RequestException|RuntimeException
      */
-    private function createException(?string $message): RequestException
+    private function createException(?string $message): \Exception
     {
         if (is_null($message)) {
             return $this->createUnknownException();
@@ -208,23 +209,13 @@ class ResponseService
     }
 
     /**
-     * @return RequestException
+     * @return RuntimeException
      */
-    private function createUnknownException(): RequestException
+    private function createUnknownException(): RuntimeException
     {
-        $level = (int) floor($this->response->getStatusCode() / 100);
-        $className = UnknownRequestException::class;
-
-        if ($level === 4) {
-            $className = UnknownClientException::class;
-        } elseif ($level === 5) {
-            $className = UnknownServerException::class;
-        }
-
-        return new $className(
+        return new RuntimeException(
             'Unknown error.',
-            $this->request,
-            $this->response,
+            0,
             $this->previousThrowable,
             ['responseBody' => $this->getResponseBody()]
         );
