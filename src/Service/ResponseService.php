@@ -101,10 +101,16 @@ class ResponseService
             }
             if ($title === 'Error') {
                 $message = $dom->getElementsByTagName('h3')->item(0)->nodeValue;
+                if (is_null($message)) {
+                    throw $this->createUnknownException();
+                }
                 throw $this->createException($message);
             }
             if ($title === 'Unauthorized') {
                 $message = $dom->getElementsByTagName('h2')->item(0)->nodeValue;
+                if (is_null($message)) {
+                    throw $this->createUnknownException();
+                }
                 throw $this->createException($message);
             }
 
@@ -131,6 +137,9 @@ class ResponseService
             $message = $json['reason'];
         }
 
+        if (is_null($message)) {
+            throw $this->createUnknownException();
+        }
         throw $this->createException($message);
     }
 
