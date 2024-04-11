@@ -211,7 +211,7 @@ class ResponseServiceTest extends TestCase
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(RuntimeException::class, $e);
-            $this->assertEquals($e->getMessage(), 'Unexpected Content-Type.');
+            $this->assertEquals($e->getMessage(), 'Failed to extract error message because Content-Type of error response is unexpected.');
             $this->assertEquals($e->getPrevious(), $exception);
             $this->assertEquals($e->getContext()['responseBody'], $body);
         }
