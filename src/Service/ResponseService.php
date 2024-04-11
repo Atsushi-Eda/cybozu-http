@@ -170,22 +170,10 @@ class ResponseService
     }
 
     /**
-     * @param string|null $message
-     * @return RequestException|RuntimeException
-     */
-    private function createException(?string $message): \Exception
-    {
-        if (is_null($message)) {
-            return $this->createUnknownException();
-        }
-        return $this->createKnownException($message);
-    }
-
-    /**
      * @param string $message
      * @return RequestException
      */
-    private function createKnownException(string $message): RequestException
+    private function createException(string $message): RequestException
     {
         $level = (int) floor($this->response->getStatusCode() / 100);
         $className = RequestException::class;
