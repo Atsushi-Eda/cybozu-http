@@ -81,7 +81,7 @@ class ResponseService
             $this->handleDomError();
         }
 
-        throw $this->createUnknownException();
+        throw $this->createUnknownException('Unexpected Content-Type.');
     }
 
     /**
@@ -102,14 +102,14 @@ class ResponseService
             if ($title === 'Error') {
                 $message = $dom->getElementsByTagName('h3')->item(0)->nodeValue;
                 if (is_null($message)) {
-                    throw $this->createUnknownException();
+                    throw $this->createUnknownException('Failed to extract error message from DOM response.');
                 }
                 throw $this->createException($message);
             }
             if ($title === 'Unauthorized') {
                 $message = $dom->getElementsByTagName('h2')->item(0)->nodeValue;
                 if (is_null($message)) {
-                    throw $this->createUnknownException();
+                    throw $this->createUnknownException('Failed to extract error message from DOM response.');
                 }
                 throw $this->createException($message);
             }
@@ -138,7 +138,7 @@ class ResponseService
         }
 
         if (is_null($message)) {
-            throw $this->createUnknownException();
+            throw $this->createUnknownException('Failed to extract error message from JSON response.');
         }
         throw $this->createException($message);
     }
@@ -197,12 +197,13 @@ class ResponseService
     }
 
     /**
+     * @param string $message
      * @return RuntimeException
      */
-    private function createUnknownException(): RuntimeException
+    private function createUnknownException(string $message): RuntimeException
     {
         return new RuntimeException(
-            'Unknown error.',
+            $message,
             0,
             $this->previousThrowable,
             ['responseBody' => $this->getResponseBody()]

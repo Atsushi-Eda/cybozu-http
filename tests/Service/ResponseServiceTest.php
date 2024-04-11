@@ -62,6 +62,19 @@ class ResponseServiceTest extends TestCase
             $this->assertEquals($e->getMessage(), 'Invalid auth.');
         }
 
+        $dom = '<title>Error</title>';
+        $response = new Response(400, ['Content-Type' => 'text/html; charset=utf-8'], $dom);
+        $exception = new RequestException('raw error', $request, $response);
+        $service = new ResponseService($request, $response, $exception);
+
+        try {
+            $service->handleError();
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(RuntimeException::class, $e);
+            $this->assertEquals($e->getMessage(), 'Failed to extract error message from DOM response.');
+        }
+
         $dom = '<title>Error</title><h3>bad request</h3>';
         $response = new Response(400, ['Content-Type' => 'text/html; charset=utf-8'], $dom);
         $exception = new RequestException('raw error', $request, $response);
@@ -73,6 +86,19 @@ class ResponseServiceTest extends TestCase
         } catch (\Exception $e) {
             $this->assertInstanceOf(ClientException::class, $e);
             $this->assertEquals($e->getMessage(), 'bad request');
+        }
+
+        $dom = '<title>Unauthorized</title>';
+        $response = new Response(400, ['Content-Type' => 'text/html; charset=utf-8'], $dom);
+        $exception = new RequestException('raw error', $request, $response);
+        $service = new ResponseService($request, $response, $exception);
+
+        try {
+            $service->handleError();
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(RuntimeException::class, $e);
+            $this->assertEquals($e->getMessage(), 'Failed to extract error message from DOM response.');
         }
 
         $dom = '<title>Unauthorized</title><h2>Bad authorized</h2>';
@@ -153,7 +179,7 @@ class ResponseServiceTest extends TestCase
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(RuntimeException::class, $e);
-            $this->assertEquals($e->getMessage(), 'Unknown error.');
+            $this->assertEquals($e->getMessage(), 'Failed to extract error message from JSON response.');
             $this->assertEquals($e->getPrevious(), $exception);
             $this->assertEquals($e->getContext()['responseBody'], $body);
         }
@@ -185,7 +211,7 @@ class ResponseServiceTest extends TestCase
             $this->assertTrue(false);
         } catch (\Exception $e) {
             $this->assertInstanceOf(RuntimeException::class, $e);
-            $this->assertEquals($e->getMessage(), 'Unknown error.');
+            $this->assertEquals($e->getMessage(), 'Unexpected Content-Type.');
             $this->assertEquals($e->getPrevious(), $exception);
             $this->assertEquals($e->getContext()['responseBody'], $body);
         }
